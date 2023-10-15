@@ -11,4 +11,4 @@
 시점 변환 : v  
 
 프로젝트 보고서  
-시연 영상 : 
+시연 영상 : https://youtu.be/byjtzA7H2-E?si=E-SMcuuvSUUPyduj  
