@@ -30,19 +30,19 @@ AABStageGimmick::AABStageGimmick()
 
 
 	// Gate Section
-	static FName GateSockets[] = { TEXT("+XGate"),TEXT("-XGATE"),TEXT("+YGate"),TEXT("-YGate") }; // µ¿¼­³²ºÏ¿¡ ÇØ´çÇÏ´Â ÀÌ¸§À» ÁöÁ¤À» À§ÇÑ ¹è¿­
+	static FName GateSockets[] = { TEXT("+XGate"),TEXT("-XGATE"),TEXT("+YGate"),TEXT("-YGate") }; // ë™ì„œë‚¨ë¶ì— í•´ë‹¹í•˜ëŠ” ì´ë¦„ì„ ì§€ì •ì„ ìœ„í•œ ë°°ì—´
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> GateMeshRef(TEXT("/Script/Engine.StaticMesh'/Game/ArenaBattle/Environment/Props/SM_GATE.SM_GATE'"));
 	for (FName GateSocket : GateSockets)
 	{
-		// ¹® Á¦ÀÛ
+		// ë¬¸ ì œì‘
 		UStaticMeshComponent* Gate = CreateDefaultSubobject<UStaticMeshComponent>(GateSocket);
 		Gate->SetStaticMesh(GateMeshRef.Object);
-		Gate->SetupAttachment(Stage, GateSocket); // Stage ½ºÅÂÆ½ ¸Ş½¬¿¡¼­ ÁöÁ¤ÇÑ ¼ÒÄÏ ÀÌ¸§ À§Ä¡¿¡ ºÎÂø
-		Gate->SetRelativeLocation(FVector(0.0f, -80.0f, 0.0f)); // ¹® À§Ä¡ ¹Ì¼¼ Á¶Á¤
-		Gate->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f)); // ¹®À» ¿­¸° ¸ğ½ÀÀ¸·Î ÃÊ±â¿¡ ¼³Á¤
+		Gate->SetupAttachment(Stage, GateSocket); // Stage ìŠ¤íƒœí‹± ë©”ì‰¬ì—ì„œ ì§€ì •í•œ ì†Œì¼“ ì´ë¦„ ìœ„ì¹˜ì— ë¶€ì°©
+		Gate->SetRelativeLocation(FVector(0.0f, -80.0f, 0.0f)); // ë¬¸ ìœ„ì¹˜ ë¯¸ì„¸ ì¡°ì •
+		Gate->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f)); // ë¬¸ì„ ì—´ë¦° ëª¨ìŠµìœ¼ë¡œ ì´ˆê¸°ì— ì„¤ì •
 		Gates.Add(GateSocket, Gate);
 
-		// ¹® Æ®¸®°Å Á¦ÀÛ
+		// ë¬¸ íŠ¸ë¦¬ê±° ì œì‘
 		FName TriggerName = *GateSocket.ToString().Append(TEXT("Trigger"));
 		UBoxComponent* GateTrigger = CreateDefaultSubobject<UBoxComponent>(TriggerName);
 		GateTrigger->SetBoxExtent(FVector(100.0f, 100.0f, 300.0f));
@@ -50,78 +50,78 @@ AABStageGimmick::AABStageGimmick()
 		GateTrigger->SetRelativeLocation(FVector(70.0f, 0.0f, 250.0f));
 		GateTrigger->SetCollisionProfileName(CPROFILE_ABTRIGGER);
 		GateTrigger->OnComponentBeginOverlap.AddDynamic(this, &AABStageGimmick::OnGateTriggerBeginOverlap);
-		GateTrigger->ComponentTags.Add(GateSocket); // ¹® Æ®¸®°ÅÀÇ µ¿¼­³²ºÏ À§Ä¡ ÆÄ¾ÇÀ» À§ÇÑ ÅÂ±× Á¤º¸¸¦ ÀúÀå
+		GateTrigger->ComponentTags.Add(GateSocket); // ë¬¸ íŠ¸ë¦¬ê±°ì˜ ë™ì„œë‚¨ë¶ ìœ„ì¹˜ íŒŒì•…ì„ ìœ„í•œ íƒœê·¸ ì •ë³´ë¥¼ ì €ì¥
 
-		GateTriggers.Add(GateTrigger); // ¹® Æ®¸®°Å ¹è¿­¿¡ »ı¼ºÇÑ ¹® Æ®¸®°Å¸¦ Ãß°¡
+		GateTriggers.Add(GateTrigger); // ë¬¸ íŠ¸ë¦¬ê±° ë°°ì—´ì— ìƒì„±í•œ ë¬¸ íŠ¸ë¦¬ê±°ë¥¼ ì¶”ê°€
 	}
 
 	// State Section
-	CurrentState = EStageState::READY; // ÃÊ±â »óÅÂ ¼³Á¤
+	CurrentState = EStageState::READY; // ì´ˆê¸° ìƒíƒœ ì„¤ì •
 
-	// µ¨¸®°ÔÀÌÆ®¿Í ÇÔ¼ö ¿¬°á
+	// ë¸ë¦¬ê²Œì´íŠ¸ì™€ í•¨ìˆ˜ ì—°ê²°
 	StateChangeActions.Add(EStageState::READY, FStageChangedDelegateWrapper(FOnStageChangedDelegate::CreateUObject(this, &AABStageGimmick::SetReady)));
 	StateChangeActions.Add(EStageState::FIGHT, FStageChangedDelegateWrapper(FOnStageChangedDelegate::CreateUObject(this, &AABStageGimmick::SetFight)));
 	StateChangeActions.Add(EStageState::REWARD, FStageChangedDelegateWrapper(FOnStageChangedDelegate::CreateUObject(this, &AABStageGimmick::SetChooseReward)));
 	StateChangeActions.Add(EStageState::NEXT, FStageChangedDelegateWrapper(FOnStageChangedDelegate::CreateUObject(this, &AABStageGimmick::SetChooseNext)));
 	
 	//Fight Section
-	OpponentSpawnTime = 2.0f; // ±âº» ½ºÆù ½Ã°£ 2ÃÊ·Î ¼¼ÆÃ
+	OpponentSpawnTime = 2.0f; // ê¸°ë³¸ ìŠ¤í° ì‹œê°„ 2ì´ˆë¡œ ì„¸íŒ…
 	OpponentClass = AABCharacterNonPlayer::StaticClass();
 
 
 	// Reward Section
-	RewardBoxClass = AABItemBox::StaticClass(); // »óÀÚ Å¬·¡½º¿¡ ´ëÇØ¼­´Â ¾ÆÀÌÅÛ ¹Ú½º Å¬·¡½º·Î ÁöÁ¤
-	for (FName GateSocket : GateSockets) // ¸®¿öµå ¹Ú½º°¡ ½ºÆùµÉ À§Ä¡´Â GateSockets¿¡ ÀÖ´Â °ªÀ» È°¿ëÇÏ¿© RewardBoxLocations¿¡ Ãß°¡ÇÑ´Ù
+	RewardBoxClass = AABItemBox::StaticClass(); // ìƒì í´ë˜ìŠ¤ì— ëŒ€í•´ì„œëŠ” ì•„ì´í…œ ë°•ìŠ¤ í´ë˜ìŠ¤ë¡œ ì§€ì •
+	for (FName GateSocket : GateSockets) // ë¦¬ì›Œë“œ ë°•ìŠ¤ê°€ ìŠ¤í°ë  ìœ„ì¹˜ëŠ” GateSocketsì— ìˆëŠ” ê°’ì„ í™œìš©í•˜ì—¬ RewardBoxLocationsì— ì¶”ê°€í•œë‹¤
 	{
 		FVector BoxLocation = Stage->GetSocketLocation(GateSocket) / 2;
 		RewardBoxLocations.Add(GateSocket, BoxLocation);
 	}
 
 	// Stage Stat
-	CurrentStageNum = 0; // ±âº»ÀûÀ¸·Î °ÔÀÓ ½ÃÀÛ
+	CurrentStageNum = 0; // ê¸°ë³¸ì ìœ¼ë¡œ ê²Œì„ ì‹œì‘
 }
 
-void AABStageGimmick::OnConstruction(const FTransform& Transform) // ¸ğµç ¼Ó¼ºÀÌ º¯°æµÉ ¶§ È£ÃâµÇ°Ô µÇ´Â ÇÔ¼ö
+void AABStageGimmick::OnConstruction(const FTransform& Transform) // ëª¨ë“  ì†ì„±ì´ ë³€ê²½ë  ë•Œ í˜¸ì¶œë˜ê²Œ ë˜ëŠ” í•¨ìˆ˜
 {
 	Super::OnConstruction(Transform);
 
-	SetState(CurrentState); // CurrentState »óÅÂ°ªÀ» º¯°æÇÏ¸é ÇØ´ç »óÅÂ°ªÀ¸·Î SetState ÇÔ¼ö¸¦ ¼öÇàÇÏµµ·Ï ÇÔ
+	SetState(CurrentState); // CurrentState ìƒíƒœê°’ì„ ë³€ê²½í•˜ë©´ í•´ë‹¹ ìƒíƒœê°’ìœ¼ë¡œ SetState í•¨ìˆ˜ë¥¼ ìˆ˜í–‰í•˜ë„ë¡ í•¨
 }
 
 void AABStageGimmick::OnStageTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* otherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	SetState(EStageState::FIGHT); // ½ºÅ×ÀÌÁö Æ®¸®°Å°¡ ¹ßµ¿µÇ¸é FIGHT »óÅÂ·Î ÁøÀÔ 
+	SetState(EStageState::FIGHT); // ìŠ¤í…Œì´ì§€ íŠ¸ë¦¬ê±°ê°€ ë°œë™ë˜ë©´ FIGHT ìƒíƒœë¡œ ì§„ì… 
 }
 
 void AABStageGimmick::OnGateTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* otherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	check(OverlappedComponent->ComponentTags.Num() == 1); // ¹® Æ®¸®°Å¿¡ GateTrigger->ComponentTags.Add(GateSocket); ¸¦ ÅëÇØ ÅÂ±×¸¦ ÇÏ³ª¾¿ ´Ş¾Æ³ù±â ¶§¹®¿¡ ÅÂ±× °¹¼ö°¡ 1ÀÌ ¾Æ´Ï¸é ÀÌ»óÀÖÀ½À» Ã¼Å©
-	FName ComponentTag = OverlappedComponent->ComponentTags[0]; // ¹® Æ®¸®°Å¿¡ ÀúÀåµÈ ÅÂ±× Á¤º¸¸¦ ¾ò¾î¼­
-	FName SocketName = FName(*ComponentTag.ToString().Left(2)); // ¿ŞÂÊ 2´Ü¾î¸¦ Â©¶ó¼­ °¡Á®¿Â´Ù. ÀÌ·¸°Ô °¡Á®¿À¸é -X,+X,-Y,+Y Áß ÇÏ³ª¸¦ ¾ò¾î¿Ã ¼ö ÀÖÀ½
-	check(Stage->DoesSocketExist(SocketName)); // ½ºÅ×ÀÌÁö¿¡¼­ ¾ò¾î³½ ¼ÒÄÏ¸íÀÌ ÀÖ´ÂÁö ¾ø´ÂÁö È®½ÇÇÏ°Ô Ã¼Å©
+	check(OverlappedComponent->ComponentTags.Num() == 1); // ë¬¸ íŠ¸ë¦¬ê±°ì— GateTrigger->ComponentTags.Add(GateSocket); ë¥¼ í†µí•´ íƒœê·¸ë¥¼ í•˜ë‚˜ì”© ë‹¬ì•„ë†¨ê¸° ë•Œë¬¸ì— íƒœê·¸ ê°¯ìˆ˜ê°€ 1ì´ ì•„ë‹ˆë©´ ì´ìƒìˆìŒì„ ì²´í¬
+	FName ComponentTag = OverlappedComponent->ComponentTags[0]; // ë¬¸ íŠ¸ë¦¬ê±°ì— ì €ì¥ëœ íƒœê·¸ ì •ë³´ë¥¼ ì–»ì–´ì„œ
+	FName SocketName = FName(*ComponentTag.ToString().Left(2)); // ì™¼ìª½ 2ë‹¨ì–´ë¥¼ ì§¤ë¼ì„œ ê°€ì ¸ì˜¨ë‹¤. ì´ë ‡ê²Œ ê°€ì ¸ì˜¤ë©´ -X,+X,-Y,+Y ì¤‘ í•˜ë‚˜ë¥¼ ì–»ì–´ì˜¬ ìˆ˜ ìˆìŒ
+	check(Stage->DoesSocketExist(SocketName)); // ìŠ¤í…Œì´ì§€ì—ì„œ ì–»ì–´ë‚¸ ì†Œì¼“ëª…ì´ ìˆëŠ”ì§€ ì—†ëŠ”ì§€ í™•ì‹¤í•˜ê²Œ ì²´í¬
 
-	FVector NewLocation = Stage->GetSocketLocation(SocketName); // ÇØ´ç ¼ÒÄÏ¸íÀÇ À§Ä¡ Á¤º¸¸¦ ¾ò¾î³¿
+	FVector NewLocation = Stage->GetSocketLocation(SocketName); // í•´ë‹¹ ì†Œì¼“ëª…ì˜ ìœ„ì¹˜ ì •ë³´ë¥¼ ì–»ì–´ëƒ„
 	TArray<FOverlapResult> OverlapResults;
 	FCollisionQueryParams CollisionQueryParam(SCENE_QUERY_STAT(GateTrigger), false, this);
 
-	// ÀÌ¹Ì ÇØ´ç ¼ÒÄÏ À§Ä¡¿¡ ´Ù¸¥ ½ºÅ×ÀÌÁö°¡ ¸¸µé¾îÁ® ÀÖÀ»¼öµµ ÀÖ±â ¶§¹®¿¡ »õ·Î¿î ½ºÅ×ÀÌÁö¸¦ ¸¸µé¾úÀ» ¶§ 
-	// °ãÄ¡´Â ¿ä¼Ò°¡ ÀÖ´ÂÁö ¾ø´ÂÁö È®ÀÎÇÑ´Ù
+	// ì´ë¯¸ í•´ë‹¹ ì†Œì¼“ ìœ„ì¹˜ì— ë‹¤ë¥¸ ìŠ¤í…Œì´ì§€ê°€ ë§Œë“¤ì–´ì ¸ ìˆì„ìˆ˜ë„ ìˆê¸° ë•Œë¬¸ì— ìƒˆë¡œìš´ ìŠ¤í…Œì´ì§€ë¥¼ ë§Œë“¤ì—ˆì„ ë•Œ 
+	// ê²¹ì¹˜ëŠ” ìš”ì†Œê°€ ìˆëŠ”ì§€ ì—†ëŠ”ì§€ í™•ì¸í•œë‹¤
 	bool bResult = GetWorld()->OverlapMultiByObjectType( 
 		OverlapResults,
 		NewLocation,
 		FQuat::Identity,
-		FCollisionObjectQueryParams::InitType::AllStaticObjects, // ¸ğµç ½ºÅÂÆ½ ¿ÀºêÁ§Æ®¿¡ ´ëÇØ¼­ °Ë»ç
-		FCollisionShape::MakeSphere(775.0f), // Å« ¿øÀ» ÇÏ³ª »ı¼ºÇØ¼­ ÇØ´ç ¼ÒÄÏ À§Ä¡¿¡¼­ °ãÄ¡´Â ¿ä¼Ò°¡ ÀÖ³ª Ã¼Å©
-		CollisionQueryParam // ¸¶Áö¸· this ÀÎÀÚ¸¦ ÅëÇØ ¸ğµç ½ºÅÂÆ½ ¿ÀºêÁ§Æ®¿¡ ´ëÇØ¼­ °Ë»çÇÒ ¶§ ÀÚ½ÅÀ» Á¦¿ÜÇÏ°í °Ë»çÇÔ
+		FCollisionObjectQueryParams::InitType::AllStaticObjects, // ëª¨ë“  ìŠ¤íƒœí‹± ì˜¤ë¸Œì íŠ¸ì— ëŒ€í•´ì„œ ê²€ì‚¬
+		FCollisionShape::MakeSphere(775.0f), // í° ì›ì„ í•˜ë‚˜ ìƒì„±í•´ì„œ í•´ë‹¹ ì†Œì¼“ ìœ„ì¹˜ì—ì„œ ê²¹ì¹˜ëŠ” ìš”ì†Œê°€ ìˆë‚˜ ì²´í¬
+		CollisionQueryParam // ë§ˆì§€ë§‰ this ì¸ìë¥¼ í†µí•´ ëª¨ë“  ìŠ¤íƒœí‹± ì˜¤ë¸Œì íŠ¸ì— ëŒ€í•´ì„œ ê²€ì‚¬í•  ë•Œ ìì‹ ì„ ì œì™¸í•˜ê³  ê²€ì‚¬í•¨
 	);
 
-	if (!bResult) // °ãÄ¡´Â °ÍÀÌ ¾Æ¹«°Íµµ ¾ø´Â °æ¿ì
+	if (!bResult) // ê²¹ì¹˜ëŠ” ê²ƒì´ ì•„ë¬´ê²ƒë„ ì—†ëŠ” ê²½ìš°
 	{
 		FTransform NewTransform(NewLocation);
-		AABStageGimmick* NewGimmick = GetWorld()->SpawnActorDeferred<AABStageGimmick>(AABStageGimmick::StaticClass(),NewTransform); // ÇØ´ç À§Ä¡¿¡ ±â¹Í ¾×ÅÍ¸¦ ½ºÆù
+		AABStageGimmick* NewGimmick = GetWorld()->SpawnActorDeferred<AABStageGimmick>(AABStageGimmick::StaticClass(),NewTransform); // í•´ë‹¹ ìœ„ì¹˜ì— ê¸°ë¯¹ ì•¡í„°ë¥¼ ìŠ¤í°
 		if (NewGimmick)
 		{
-			NewGimmick->SetStageNum(CurrentStageNum + 1); // »õ·Ó°Ô ½ºÆùµÇ´Â ½ºÅ×ÀÌÁö´Â ÀÌÀü ½ºÅ×ÀÌÁöº¸´Ù ÇÏ³ª ³ôÀº ·¹º§°ªÀ» °®µµ·Ï ÇÔ
+			NewGimmick->SetStageNum(CurrentStageNum + 1); // ìƒˆë¡­ê²Œ ìŠ¤í°ë˜ëŠ” ìŠ¤í…Œì´ì§€ëŠ” ì´ì „ ìŠ¤í…Œì´ì§€ë³´ë‹¤ í•˜ë‚˜ ë†’ì€ ë ˆë²¨ê°’ì„ ê°–ë„ë¡ í•¨
 			NewGimmick->FinishSpawning(NewTransform);
 		}
 	}
@@ -131,7 +131,7 @@ void AABStageGimmick::OpenAllGates()
 {
 	for (auto Gate : Gates)
 	{
-		(Gate.Value)->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f)); // ¹®ÀÌ ¿­¸®µµ·Ï È¸Àü
+		(Gate.Value)->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f)); // ë¬¸ì´ ì—´ë¦¬ë„ë¡ íšŒì „
 	}
 }
 
@@ -139,16 +139,16 @@ void AABStageGimmick::CloseAllGates()
 {
 	for (auto Gate : Gates)
 	{
-		(Gate.Value)->SetRelativeRotation(FRotator::ZeroRotator); // ±âº» È¸Àü°ªÀ¸·Î ¼³Á¤ÇÏ¿© ¹®ÀÌ ´İÈ÷°Ô ÇÔ
+		(Gate.Value)->SetRelativeRotation(FRotator::ZeroRotator); // ê¸°ë³¸ íšŒì „ê°’ìœ¼ë¡œ ì„¤ì •í•˜ì—¬ ë¬¸ì´ ë‹«íˆê²Œ í•¨
 	}
 }
 
 void AABStageGimmick::SetState(EStageState InNewState)
 {
 	/*
-		ÇöÀç »óÅÂ¸¦ º¸°í ´ÙÀ½ »óÅÂ¸¦ ¼³Á¤ÇÏ´Â °ÍÀ» switch ¹®À» ÅëÇØ¼­µµ 
-		°£´ÜÇÏ°Ô ±¸Çö °¡´ÉÇÏÁö¸¸ »óÅÂ°¡ ¸¹¾ÆÁö¸é switch·Î ±¸Çö ½Ã ÄÚµå°¡ 
-		º¹ÀâÇØÁö´Â ¹®Á¦°¡ ÀÖ±â ¶§¹®¿¡ µ¨¸®°ÔÀÌÆ®·Î ±¸ÇöÇÏ´Â °ÍÀ» ÃßÃµÇÑ´Ù
+		í˜„ì¬ ìƒíƒœë¥¼ ë³´ê³  ë‹¤ìŒ ìƒíƒœë¥¼ ì„¤ì •í•˜ëŠ” ê²ƒì„ switch ë¬¸ì„ í†µí•´ì„œë„ 
+		ê°„ë‹¨í•˜ê²Œ êµ¬í˜„ ê°€ëŠ¥í•˜ì§€ë§Œ ìƒíƒœê°€ ë§ì•„ì§€ë©´ switchë¡œ êµ¬í˜„ ì‹œ ì½”ë“œê°€ 
+		ë³µì¡í•´ì§€ëŠ” ë¬¸ì œê°€ ìˆê¸° ë•Œë¬¸ì— ë¸ë¦¬ê²Œì´íŠ¸ë¡œ êµ¬í˜„í•˜ëŠ” ê²ƒì„ ì¶”ì²œí•œë‹¤
 	*/
 
 	CurrentState = InNewState;
@@ -160,50 +160,50 @@ void AABStageGimmick::SetState(EStageState InNewState)
 
 void AABStageGimmick::SetReady()
 {
-	StageTrigger->SetCollisionProfileName(CPROFILE_ABTRIGGER); // ½ºÅ×ÀÌÁö¿¡ ÁøÀÔ ½Ã ´ÙÀ½ »óÅÂ·Î ³Ñ¾î°¥ ¼ö ÀÖµµ·Ï ½ºÅ×ÀÌÁö Æ®¸®°ÅÀÇ Äİ¸®ÀüÀ» È°¼ºÈ­
-	for (auto GateTrigger : GateTriggers) // °¢°¢ÀÇ ¹®¿¡ ´ëÇØ¼­´Â Äİ¸®ÀüÀ» È°¼ºÈ­ÇÒ ÇÊ¿ä°¡ ¾øÀ¸¹Ç·Î, ÀüºÎ Äİ¸®ÀüÀ» ºñÈ°¼ºÈ­ÇÑ´Ù
+	StageTrigger->SetCollisionProfileName(CPROFILE_ABTRIGGER); // ìŠ¤í…Œì´ì§€ì— ì§„ì… ì‹œ ë‹¤ìŒ ìƒíƒœë¡œ ë„˜ì–´ê°ˆ ìˆ˜ ìˆë„ë¡ ìŠ¤í…Œì´ì§€ íŠ¸ë¦¬ê±°ì˜ ì½œë¦¬ì „ì„ í™œì„±í™”
+	for (auto GateTrigger : GateTriggers) // ê°ê°ì˜ ë¬¸ì— ëŒ€í•´ì„œëŠ” ì½œë¦¬ì „ì„ í™œì„±í™”í•  í•„ìš”ê°€ ì—†ìœ¼ë¯€ë¡œ, ì „ë¶€ ì½œë¦¬ì „ì„ ë¹„í™œì„±í™”í•œë‹¤
 	{
 		GateTrigger->SetCollisionProfileName(TEXT("NoCollision"));
 	}
-	OpenAllGates(); // ´ëÀüÀÌ ½ÃÀÛµÇ±â ¶§¹®¿¡, ÇÃ·¹ÀÌ¾î°¡ ³ª°¡Áö ¸øÇÏµµ·Ï ¸ğµç ¹®À» ´İÀ½
+	OpenAllGates(); // ëŒ€ì „ì´ ì‹œì‘ë˜ê¸° ë•Œë¬¸ì—, í”Œë ˆì´ì–´ê°€ ë‚˜ê°€ì§€ ëª»í•˜ë„ë¡ ëª¨ë“  ë¬¸ì„ ë‹«ìŒ
 }
 
 void AABStageGimmick::SetFight()
 {
-	// ´ëÀü ½ÃÀÛ ½Ã ½ºÅ×ÀÌÁö Æ®¸®°Å, ¹® Æ®¸®°Å´Â ¹ßµ¿ÇÒ ÇÊ¿ä°¡ ¾øÀ¸¹Ç·Î Äİ¸®ÀüÀ» ÀüºÎ ºñÈ°¼ºÈ­
+	// ëŒ€ì „ ì‹œì‘ ì‹œ ìŠ¤í…Œì´ì§€ íŠ¸ë¦¬ê±°, ë¬¸ íŠ¸ë¦¬ê±°ëŠ” ë°œë™í•  í•„ìš”ê°€ ì—†ìœ¼ë¯€ë¡œ ì½œë¦¬ì „ì„ ì „ë¶€ ë¹„í™œì„±í™”
 	StageTrigger->SetCollisionProfileName(TEXT("NoCollision"));
 	for (auto GateTrigger : GateTriggers)
 	{
 		GateTrigger->SetCollisionProfileName(TEXT("NoCollision"));
 	}
-	CloseAllGates(); // ¹®ÀÌ È®½ÇÈ÷ ÀüºÎ ´İÈ÷µµ·Ï ´Ù½Ã ÇÑ ¹ø ¸ğµç ¹®À» ´İÀ½
+	CloseAllGates(); // ë¬¸ì´ í™•ì‹¤íˆ ì „ë¶€ ë‹«íˆë„ë¡ ë‹¤ì‹œ í•œ ë²ˆ ëª¨ë“  ë¬¸ì„ ë‹«ìŒ
 
 	GetWorld()->GetTimerManager().SetTimer(OpponentTimerHandle, this, &AABStageGimmick::OnOpponentSpawn, OpponentSpawnTime, false); 
-	// Å¸ÀÌ¸Ó¸¦ ÅëÇØ¼­ ¹®ÀÌ ´İÈ÷°í ³ª¼­ ÁöÁ¤µÈ ½ºÆù ½Ã°£ ÀÌÈÄ¿¡ NPC°¡ ½ºÅ×ÀÌÁö¿¡ »ı¼ºµÇµµ·Ï ÇÏ´Â ÇÔ¼ö ÀÚµ¿ ½ÇÇà
+	// íƒ€ì´ë¨¸ë¥¼ í†µí•´ì„œ ë¬¸ì´ ë‹«íˆê³  ë‚˜ì„œ ì§€ì •ëœ ìŠ¤í° ì‹œê°„ ì´í›„ì— NPCê°€ ìŠ¤í…Œì´ì§€ì— ìƒì„±ë˜ë„ë¡ í•˜ëŠ” í•¨ìˆ˜ ìë™ ì‹¤í–‰
 }
 
 void AABStageGimmick::SetChooseReward()
 {
-	// »óÀÚ¸¦ ¼±ÅÃÇÏ±â Àü±îÁö´Â ½ºÅ×ÀÌÁö Æ®¸®°Å, ¹® Æ®¸®°Å´Â ¹ßµ¿ÇÒ ÇÊ¿ä°¡ ¾øÀ¸¹Ç·Î Äİ¸®ÀüÀ» ÀüºÎ ºñÈ°¼ºÈ­
+	// ìƒìë¥¼ ì„ íƒí•˜ê¸° ì „ê¹Œì§€ëŠ” ìŠ¤í…Œì´ì§€ íŠ¸ë¦¬ê±°, ë¬¸ íŠ¸ë¦¬ê±°ëŠ” ë°œë™í•  í•„ìš”ê°€ ì—†ìœ¼ë¯€ë¡œ ì½œë¦¬ì „ì„ ì „ë¶€ ë¹„í™œì„±í™”
 	StageTrigger->SetCollisionProfileName(TEXT("NoCollision"));
 	for (auto GateTrigger : GateTriggers)
 	{
 		GateTrigger->SetCollisionProfileName(TEXT("NoCollision"));
 	}
-	CloseAllGates(); // »óÀÚ¸¦ ¼±ÅÃÇÏ±â Àü±îÁö´Â ´ÙÀ½ ¸ÊÀ¸·Î ³ª°¥ ¼ö ¾øÀ¸¹Ç·Î ¹®ÀÌ ´İÇôÀÖ¾î¾ß ÇÔ
+	CloseAllGates(); // ìƒìë¥¼ ì„ íƒí•˜ê¸° ì „ê¹Œì§€ëŠ” ë‹¤ìŒ ë§µìœ¼ë¡œ ë‚˜ê°ˆ ìˆ˜ ì—†ìœ¼ë¯€ë¡œ ë¬¸ì´ ë‹«í˜€ìˆì–´ì•¼ í•¨
 	SpawnRewardBoxes();
 }
 
 void AABStageGimmick::SetChooseNext()
 {
-	// »óÀÚ ¼±ÅÃ ÈÄ ´ÙÀ½ ½ºÅ×ÀÌÁö·Î ³Ñ¾î°¡±â À§ÇØ¼­, ½ºÅ×ÀÌÁö Æ®¸®°Å Äİ¸®ÀüÀº ºÒÇÊ¿äÇÔÀ¸·Î ºñÈ°¼ºÈ­
-	// ¹® Æ®¸®°Å´Â ´ÙÀ½ ½ºÅ×ÀÌÁö¸¦ À§ÇØ ÇÊ¿äÇÏ±â ¶§¹®¿¡ ¹® Æ®¸®°Å Äİ¸®Àü¸¸À» È°¼ºÈ­
+	// ìƒì ì„ íƒ í›„ ë‹¤ìŒ ìŠ¤í…Œì´ì§€ë¡œ ë„˜ì–´ê°€ê¸° ìœ„í•´ì„œ, ìŠ¤í…Œì´ì§€ íŠ¸ë¦¬ê±° ì½œë¦¬ì „ì€ ë¶ˆí•„ìš”í•¨ìœ¼ë¡œ ë¹„í™œì„±í™”
+	// ë¬¸ íŠ¸ë¦¬ê±°ëŠ” ë‹¤ìŒ ìŠ¤í…Œì´ì§€ë¥¼ ìœ„í•´ í•„ìš”í•˜ê¸° ë•Œë¬¸ì— ë¬¸ íŠ¸ë¦¬ê±° ì½œë¦¬ì „ë§Œì„ í™œì„±í™”
 	StageTrigger->SetCollisionProfileName(TEXT("NoCollision"));
 	for (auto GateTrigger : GateTriggers)
 	{
 		GateTrigger->SetCollisionProfileName(CPROFILE_ABTRIGGER);
 	}
-	OpenAllGates(); // ´ÙÀ½ ½ºÅ×ÀÌÁö ÁøÀÔÀ» À§ÇØ ¸ğµç ¹®À» ¿¬´Ù
+	OpenAllGates(); // ë‹¤ìŒ ìŠ¤í…Œì´ì§€ ì§„ì…ì„ ìœ„í•´ ëª¨ë“  ë¬¸ì„ ì—°ë‹¤
 }
 
 void AABStageGimmick::OnOpponentDestroyed(AActor* DesetroyActor)
@@ -211,24 +211,24 @@ void AABStageGimmick::OnOpponentDestroyed(AActor* DesetroyActor)
 	IABGameInterface* ABGameMode = Cast<IABGameInterface>(GetWorld()->GetAuthGameMode());
 	if (ABGameMode)
 	{
-		ABGameMode->OnPlayerScoreChanged(CurrentStageNum); // Å¬¸®¾î ÇÑ ÇöÀç StageNumÀ» ÀÎÀÚ·Î ÁÖ¾î È®ÀÎÇÏ¿© ½ºÅ×ÀÌÁö¸¦ Å¬¸®¾îÇß´ÂÁö ¾ÈÇß´ÂÁö È®ÀÎÇÑ´Ù
+		ABGameMode->OnPlayerScoreChanged(CurrentStageNum); // í´ë¦¬ì–´ í•œ í˜„ì¬ StageNumì„ ì¸ìë¡œ ì£¼ì–´ í™•ì¸í•˜ì—¬ ìŠ¤í…Œì´ì§€ë¥¼ í´ë¦¬ì–´í–ˆëŠ”ì§€ ì•ˆí–ˆëŠ”ì§€ í™•ì¸í•œë‹¤
 		if (ABGameMode->IsGameCleared())
 		{
-			return; // °ÔÀÓÀÌ Å¬¸®¾î µÈ »óÅÂ¶ó¸é ´ÙÀ½ »óÅÂ·Î ÁøÇàµÇÁö ¾Êµµ·Ï Áï½Ã ¸®ÅÏ. ÀÌ·¯¸é º¸»ó »óÀÚ°¡ ³ª¿ÀÁö ¾Ê°í ¸ØÃß°Ô µÈ´Ù
+			return; // ê²Œì„ì´ í´ë¦¬ì–´ ëœ ìƒíƒœë¼ë©´ ë‹¤ìŒ ìƒíƒœë¡œ ì§„í–‰ë˜ì§€ ì•Šë„ë¡ ì¦‰ì‹œ ë¦¬í„´. ì´ëŸ¬ë©´ ë³´ìƒ ìƒìê°€ ë‚˜ì˜¤ì§€ ì•Šê³  ë©ˆì¶”ê²Œ ëœë‹¤
 		}
 	}
-	SetState(EStageState::REWARD); // NPC »ç¸Á ½Ã ´ÙÀ½ »óÅÂÀÎ REWARD »óÅÂ·Î ÀÌµ¿
+	SetState(EStageState::REWARD); // NPC ì‚¬ë§ ì‹œ ë‹¤ìŒ ìƒíƒœì¸ REWARD ìƒíƒœë¡œ ì´ë™
 }
 
 void AABStageGimmick::OnOpponentSpawn()
 {
-	const FTransform SpawnTransform(GetActorLocation() + FVector::UpVector * 88.0f); // NPC ½ºÆù À§Ä¡ ¼³Á¤
+	const FTransform SpawnTransform(GetActorLocation() + FVector::UpVector * 88.0f); // NPC ìŠ¤í° ìœ„ì¹˜ ì„¤ì •
 	AABCharacterNonPlayer* ABOpponentCharacter = GetWorld()->SpawnActorDeferred<AABCharacterNonPlayer>(OpponentClass, SpawnTransform);
 	if (ABOpponentCharacter)
 	{
-		ABOpponentCharacter->OnDestroyed.AddDynamic(this, &AABStageGimmick::OnOpponentDestroyed); // NPC »ç¸Á ½Ã ÀÚµ¿À¸·Î ½ÇÇàµÉ, OnDestroyed µ¨¸®°ÔÀÌÆ®¿¡ ÇÔ¼ö ¿¬°á
+		ABOpponentCharacter->OnDestroyed.AddDynamic(this, &AABStageGimmick::OnOpponentDestroyed); // NPC ì‚¬ë§ ì‹œ ìë™ìœ¼ë¡œ ì‹¤í–‰ë , OnDestroyed ë¸ë¦¬ê²Œì´íŠ¸ì— í•¨ìˆ˜ ì—°ê²°
 		
-		// NPC ½ºÆù ½Ã ±â¹ÍÀÌ °¡Áö°í ÀÖ´Â Á¤º¸¸¦ »ç¿ëÇØ¼­ NPCÀÇ ·¹º§À» ÁöÁ¤ÇÑ´Ù
+		// NPC ìŠ¤í° ì‹œ ê¸°ë¯¹ì´ ê°€ì§€ê³  ìˆëŠ” ì •ë³´ë¥¼ ì‚¬ìš©í•´ì„œ NPCì˜ ë ˆë²¨ì„ ì§€ì •í•œë‹¤
 		ABOpponentCharacter->SetLevel(CurrentStageNum);
 		ABOpponentCharacter->FinishSpawning(SpawnTransform);
 	}
@@ -238,15 +238,15 @@ void AABStageGimmick::OnOpponentSpawn()
 
 void AABStageGimmick::OnRewardTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	for (const auto& RewardBox : RewardBoxes) // ¾à ÂüÁ¶ ¹è¿­À» ¼øÈ¸
+	for (const auto& RewardBox : RewardBoxes) // ì•½ ì°¸ì¡° ë°°ì—´ì„ ìˆœíšŒ
 	{
-		if (RewardBox.IsValid()) // ¾àÂüÁ¶ÀÌ¹Ç·Î ÀÌ°ÍÀÌ ÁøÂ¥ ÀÖ´ÂÁö ¾ø´ÂÁö À¯È¿¼ºÀ» È®½ÅÇÒ ¼ö ¾ø±â ¶§¹®¿¡ IsValid ÇÔ¼ö·Î ¹è¿­ ¿ä¼Ò¸¦ È®ÀÎÇÑ´Ù
+		if (RewardBox.IsValid()) // ì•½ì°¸ì¡°ì´ë¯€ë¡œ ì´ê²ƒì´ ì§„ì§œ ìˆëŠ”ì§€ ì—†ëŠ”ì§€ ìœ íš¨ì„±ì„ í™•ì‹ í•  ìˆ˜ ì—†ê¸° ë•Œë¬¸ì— IsValid í•¨ìˆ˜ë¡œ ë°°ì—´ ìš”ì†Œë¥¼ í™•ì¸í•œë‹¤
 		{
-			AABItemBox* ValidItemBox = RewardBox.Get(); // ÀÖ´Ù¸é Get ÇÔ¼ö¸¦ ÅëÇØ ÇØ´ç ¸®¿öµå ¹Ú½º¿¡ ´ëÇÑ Æ÷ÀÎÅÍ¸¦ ¾ò´Â´Ù
-			AActor* OverlappedBox = OverlappedComponent->GetOwner(); // ÇöÀç ¿À¹ö·¦ ÀÌº¥Æ®°¡ ¹ß»ıÇÑ ¾×ÅÍ, Áï ÀÌº¥Æ®°¡ ¹ß»ıÇÑ ¸®¿öµå ¹Ú½º ¾×ÅÍ¸¦ ¾ò¾î¿È
+			AABItemBox* ValidItemBox = RewardBox.Get(); // ìˆë‹¤ë©´ Get í•¨ìˆ˜ë¥¼ í†µí•´ í•´ë‹¹ ë¦¬ì›Œë“œ ë°•ìŠ¤ì— ëŒ€í•œ í¬ì¸í„°ë¥¼ ì–»ëŠ”ë‹¤
+			AActor* OverlappedBox = OverlappedComponent->GetOwner(); // í˜„ì¬ ì˜¤ë²„ë© ì´ë²¤íŠ¸ê°€ ë°œìƒí•œ ì•¡í„°, ì¦‰ ì´ë²¤íŠ¸ê°€ ë°œìƒí•œ ë¦¬ì›Œë“œ ë°•ìŠ¤ ì•¡í„°ë¥¼ ì–»ì–´ì˜´
 			
-			// ¹è¿­¿¡ ÀúÀåµÈ ¸®¿öµå ¹Ú½º¿Í ¿À¹ö·¦ ÀÌº¥Æ®°¡ ¹ß»ıÇÑ ¸®¿öµå ¹Ú½º ¾×ÅÍ°¡ ¼­·Î °°Àº °ÍÀº ½ÀµæÇÑ ¸®¿öµå ¹Ú½ºÀÌ°í, 
-			// ´Ù¸¥ °ÍÀº ½ÀµæÇÏÁö ¾ÊÀº ¸®¿öµå ¹Ú½ºÀÌ¹Ç·Î ÇÏ³ªÀÇ º¸»ó¸¸ ¸ÔÀ» ¼ö ÀÖµµ·Ï ÇÏ±â À§ÇØ¼­ ½ÀµæÇÏÁö ¾ÊÀº ³ª¸ÓÁö ¸®¿öµå ¹Ú½ºµéÀº Áï½Ã Á¦°ÅÇÑ´Ù
+			// ë°°ì—´ì— ì €ì¥ëœ ë¦¬ì›Œë“œ ë°•ìŠ¤ì™€ ì˜¤ë²„ë© ì´ë²¤íŠ¸ê°€ ë°œìƒí•œ ë¦¬ì›Œë“œ ë°•ìŠ¤ ì•¡í„°ê°€ ì„œë¡œ ê°™ì€ ê²ƒì€ ìŠµë“í•œ ë¦¬ì›Œë“œ ë°•ìŠ¤ì´ê³ , 
+			// ë‹¤ë¥¸ ê²ƒì€ ìŠµë“í•˜ì§€ ì•Šì€ ë¦¬ì›Œë“œ ë°•ìŠ¤ì´ë¯€ë¡œ í•˜ë‚˜ì˜ ë³´ìƒë§Œ ë¨¹ì„ ìˆ˜ ìˆë„ë¡ í•˜ê¸° ìœ„í•´ì„œ ìŠµë“í•˜ì§€ ì•Šì€ ë‚˜ë¨¸ì§€ ë¦¬ì›Œë“œ ë°•ìŠ¤ë“¤ì€ ì¦‰ì‹œ ì œê±°í•œë‹¤
 			if (OverlappedBox != ValidItemBox) 
 			{
 				ValidItemBox->Destroy();
@@ -254,7 +254,7 @@ void AABStageGimmick::OnRewardTriggerBeginOverlap(UPrimitiveComponent* Overlappe
 		}
 	}
 
-	SetState(EStageState::NEXT); // ¸®¿öµå ¹Ú½º¸¦ ½ÀµæÇß´Ù¸é ´ÙÀ½ »óÅÂÀÎ NEXT »óÅÂ·Î ³Ñ¾î°¨
+	SetState(EStageState::NEXT); // ë¦¬ì›Œë“œ ë°•ìŠ¤ë¥¼ ìŠµë“í–ˆë‹¤ë©´ ë‹¤ìŒ ìƒíƒœì¸ NEXT ìƒíƒœë¡œ ë„˜ì–´ê°
 }
 
 void AABStageGimmick::SpawnRewardBoxes()
@@ -265,12 +265,14 @@ void AABStageGimmick::SpawnRewardBoxes()
 		AABItemBox* RewardBoxActor = GetWorld()->SpawnActorDeferred<AABItemBox>(RewardBoxClass, SpawnTransform);
 		if (RewardBoxActor)
 		{
-			RewardBoxActor->Tags.Add(RewardBoxLocation.Key); // ÇØ´ç ¸®¿öµå ¹Ú½ºÀÇ ÅÂ±×·Î ¸®¿öµå ¹Ú½ºÀÇ À§Ä¡ Å°°ªÀ» ³Ö´Â´Ù
-			RewardBoxActor->GetTrigger()->OnComponentBeginOverlap.AddDynamic(this, &AABStageGimmick::OnRewardTriggerBeginOverlap); // ¸®¿öµå ¹Ú½ºÀÇ Æ®¸®°Å ¹Ú½º¸¦ °¡Á®¿Í ¿À¹ö·¦ µÉ ¶§ ¼öÇàµÉ µ¨¸®°ÔÀÌÆ®¿Í ÇÔ¼ö¸¦ ¿¬°á
-			RewardBoxes.Add(RewardBoxActor); // ¸®¿öµå ¹Ú½º ¹è¿­¿¡ ½ºÆùµÈ ¸®¿öµå ¹Ú½º Ãß°¡
+			RewardBoxActor->Tags.Add(RewardBoxLocation.Key); // í•´ë‹¹ ë¦¬ì›Œë“œ ë°•ìŠ¤ì˜ íƒœê·¸ë¡œ ë¦¬ì›Œë“œ ë°•ìŠ¤ì˜ ìœ„ì¹˜ í‚¤ê°’ì„ ë„£ëŠ”ë‹¤
+			RewardBoxActor->GetTrigger()->OnComponentBeginOverlap.AddDynamic(this, &AABStageGimmick::OnRewardTriggerBeginOverlap); // ë¦¬ì›Œë“œ ë°•ìŠ¤ì˜ íŠ¸ë¦¬ê±° ë°•ìŠ¤ë¥¼ ê°€ì ¸ì™€ ì˜¤ë²„ë© ë  ë•Œ ìˆ˜í–‰ë  ë¸ë¦¬ê²Œì´íŠ¸ì™€ í•¨ìˆ˜ë¥¼ ì—°ê²°
+			RewardBoxes.Add(RewardBoxActor); // ë¦¬ì›Œë“œ ë°•ìŠ¤ ë°°ì—´ì— ìŠ¤í°ëœ ë¦¬ì›Œë“œ ë°•ìŠ¤ ì¶”ê°€
 		}
 	}
-
+	
+	// ì§€ì—°ì„ í†µí•´ ì•ì—ì„œ ì™„ì „íˆ ìƒìì— ëŒ€í•œ ì„¤ì •ì„ ëë‚˜ê³  ì§€ì—°ì„ í•´ì œí•´
+	// ABItemBoxì˜ PostInitializeComponents í•¨ìˆ˜ë¥¼ ë‚˜ì¤‘ì— ì§„í–‰ì‹œí‚´
 	for (const auto& RewardBox : RewardBoxes)
 	{
 		if (RewardBox.IsValid())
