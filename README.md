@@ -10,5 +10,6 @@
 점프 : Space 바
 시점 변환 : v  
 
-프로젝트 보고서  
+[프로젝트 보고서](https://docs.google.com/viewer?url=https://github.com/Seon-dongun/UE5_Project_ArenaBattle/raw/main/UE5_ArenaBattle_보고서.pdf)  
+
 시연 영상 : https://youtu.be/byjtzA7H2-E?si=E-SMcuuvSUUPyduj  
