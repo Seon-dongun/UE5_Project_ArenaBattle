@@ -9,40 +9,40 @@
 
 UBTService_Detect::UBTService_Detect()
 {
-	NodeName = TEXT("Detect"); // ³ëµå ÀÌ¸§ ÁöÁ¤
-	Interval = 1.0f; // ÀÎÅÍ¹ú °£°İ ¼³Á¤
+	NodeName = TEXT("Detect"); // ë…¸ë“œ ì´ë¦„ ì§€ì •
+	Interval = 1.0f; // ì¸í„°ë²Œ ê°„ê²© ì„¤ì •
 }
 
 void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DelatSeconds)
 {
 	Super::TickNode(OwnerComp, NodeMemory, DelatSeconds);
 
-	APawn* ControlligPawn = OwnerComp.GetAIOwner()->GetPawn(); // AI·Î ºÎÅÍ Áö±İ Á¦¾îÇÏ°í ÀÖ´Â ÆùÀÇ Á¤º¸¸¦ ¾ò¾î¿È
+	APawn* ControlligPawn = OwnerComp.GetAIOwner()->GetPawn(); // AIë¡œ ë¶€í„° ì§€ê¸ˆ ì œì–´í•˜ê³  ìˆëŠ” í°ì˜ ì •ë³´ë¥¼ ì–»ì–´ì˜´
 	if (nullptr == ControlligPawn)
 	{
 		return;
 	}
 
-	FVector Center = ControlligPawn->GetActorLocation(); // ÆùÀÇ À§Ä¡
-	UWorld* World = ControlligPawn->GetWorld(); // ÆùÀÌ ¼ÓÇÑ ¿ùµå°ª
+	FVector Center = ControlligPawn->GetActorLocation(); // í°ì˜ ìœ„ì¹˜
+	UWorld* World = ControlligPawn->GetWorld(); // í°ì´ ì†í•œ ì›”ë“œê°’
 	if (nullptr == World)
 	{
 		return;
 	}
 
-	IABCharacterAIInterface* AIPawn = Cast<IABCharacterAIInterface>(ControlligPawn); // ÇØ´ç ÆùÀÌ ÇÊ¼ö ÀÎÅÍÆäÀÌ½º »ó¼Ó¹Ş¾Ò³ª Ã¼Å©
+	IABCharacterAIInterface* AIPawn = Cast<IABCharacterAIInterface>(ControlligPawn); // í•´ë‹¹ í°ì´ í•„ìˆ˜ ì¸í„°í˜ì´ìŠ¤ ìƒì†ë°›ì•˜ë‚˜ ì²´í¬
 	if (nullptr == AIPawn)
 	{
 		return;
 	}
 
-	float DetectRadius = AIPawn->GetAIDetectRange(); // ÀÎÅÍÆäÀÌ½º·ÎºÎÅÍ °¨ÁöÇÒ ¿µ¿ª¿¡ ´ëÇÑ °ªÀ» ¾ò¾î¿È
+	float DetectRadius = AIPawn->GetAIDetectRange(); // ì¸í„°í˜ì´ìŠ¤ë¡œë¶€í„° ê°ì§€í•  ì˜ì—­ì— ëŒ€í•œ ê°’ì„ ì–»ì–´ì˜´
 
-	// NPCÀÇ °¨Áö ±¸Çö
+	// NPCì˜ ê°ì§€ êµ¬í˜„
 	TArray<FOverlapResult> OverlapResults;
 	FCollisionQueryParams CollisionQueryParams(SCENE_QUERY_STAT(Detect), false, ControlligPawn);
 
-	// ÀÌ¹ø¿¡´Â OverlapMultiByChannel ÇÔ¼ö¸¦ ÅëÇØ ´Ù¼ö¸¦ °¨ÁöÇÑ´Ù. µû¶ó¼­ °¨ÁöµÈ °á°ú¸¦ ´ã´Â °ÍÀÌ TArray<FOverlapResult> OverlapResults ¿Í °°Àº ¹è¿­ÀÌ´Ù. 
+	// ì´ë²ˆì—ëŠ” OverlapMultiByChannel í•¨ìˆ˜ë¥¼ í†µí•´ ë‹¤ìˆ˜ë¥¼ ê°ì§€í•œë‹¤. ë”°ë¼ì„œ ê°ì§€ëœ ê²°ê³¼ë¥¼ ë‹´ëŠ” ê²ƒì´ TArray<FOverlapResult> OverlapResults ì™€ ê°™ì€ ë°°ì—´ì´ë‹¤. 
 	bool bResult = World->OverlapMultiByChannel(
 		OverlapResults,
 		Center,
@@ -52,17 +52,17 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 		CollisionQueryParams
 	);
 
-	if (bResult) // NPC°¡ °¨Áö ¼º°ø ½Ã
+	if (bResult) // NPCê°€ ê°ì§€ ì„±ê³µ ì‹œ
 	{
-		for (auto const& OverlapResult : OverlapResults) // °¨ÁöÇÑ °ÍµéÀ» Ã¼Å©
+		for (auto const& OverlapResult : OverlapResults) // ê°ì§€í•œ ê²ƒë“¤ì„ ì²´í¬
 		{
 			APawn* Pawn = Cast<APawn>(OverlapResult.GetActor());
-			if (Pawn && Pawn->GetController()->IsPlayerController()) // ÇØ´ç ÆùÀ» Á¶Á¾ÇÏ°í ÀÖ´Â °ÍÀÌ ÇÃ·¹ÀÌ¾î ÄÁÆ®·Ñ·¯ÀÎ °æ¿ì, Áï ÇÃ·¹ÀÌ¾î Ä³¸¯ÅÍÀÎ °æ¿ì¸¸ °¨ÁöÇÑ´Ù
+			if (Pawn && Pawn->GetController()->IsPlayerController()) // í•´ë‹¹ í°ì„ ì¡°ì¢…í•˜ê³  ìˆëŠ” ê²ƒì´ í”Œë ˆì´ì–´ ì»¨íŠ¸ë¡¤ëŸ¬ì¸ ê²½ìš°, ì¦‰ í”Œë ˆì´ì–´ ìºë¦­í„°ì¸ ê²½ìš°ë§Œ ê°ì§€í•œë‹¤
 			{
-				OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGET, Pawn); // ºí·¢º¸µåÀÇ Target°ªÀ» PawnÀ¸·Î ÁöÁ¤
-				DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Green, false, 0.2f); // °¨Áö ¼º°ø½Ã ÃÊ·Ï»öÀ¸·Î NPC °¨Áö ¿µ¿ª Ç¥Çö
+				OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGET, Pawn); // ë¸”ë™ë³´ë“œì˜ Targetê°’ì„ Pawnìœ¼ë¡œ ì§€ì •
+				DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Green, false, 0.2f); // ê°ì§€ ì„±ê³µì‹œ ì´ˆë¡ìƒ‰ìœ¼ë¡œ NPC ê°ì§€ ì˜ì—­ í‘œí˜„
 
-				// °¨Áö ¼º°ø½Ã ÃÊ·Ï»öÀ¸·Î ÇÃ·¹ÀÌ¾î¿ÍÀÇ À§Ä¡¸¦ ¼±°ú Á¡À¸·Î Ç¥Çö
+				// ê°ì§€ ì„±ê³µì‹œ ì´ˆë¡ìƒ‰ìœ¼ë¡œ ê°ì§€ ì˜ì—­ í‘œí˜„
 				DrawDebugPoint(World, Pawn->GetActorLocation(), 10.0f, FColor::Green, false, 0.2f);
 				DrawDebugLine(World, ControlligPawn->GetActorLocation(), Pawn->GetActorLocation(), FColor::Green, false, 0.27f);
 				return;
@@ -70,8 +70,8 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 		}
 	}
 	
-	// ¸¸¾à ÇÃ·¹ÀÌ¾î¿¡ ´ëÇØ¼­ Ã£Áö ¸øÇÑ °æ¿ì
-	OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGET, nullptr); // ºí·¢º¸µåÀÇ Target°ªÀ» nullptr·Î ÁöÁ¤
-	DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Red, false, 0.2f); // °¨Áö ½ÇÆĞ ½Ã ºÓÀº»öÀ¸·Î NPC °¨Áö ¿µ¿ª Ç¥Çö
+	// ë§Œì•½ í”Œë ˆì´ì–´ì— ëŒ€í•´ì„œ ì°¾ì§€ ëª»í•œ ê²½ìš°
+	OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGET, nullptr); // ë¸”ë™ë³´ë“œì˜ Targetê°’ì„ nullptrë¡œ ì§€ì •
+	DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Red, false, 0.2f); // ê°ì§€ ì‹¤íŒ¨ ì‹œ ë¶‰ì€ìƒ‰ìœ¼ë¡œ NPC ê°ì§€ ì˜ì—­ í‘œí˜„
 
 }
