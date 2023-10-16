@@ -19,14 +19,16 @@ class ARENABATTLE_API AABPlayerController : public APlayerController
 public:
 	AABPlayerController();
 
-	// ºí·çÇÁ¸°Æ®¿¡¼­ ÀÌº¥Æ®¸¦ ¹ßµ¿½ÃÅ°´Â °ÍÃ³·³ ±â´ÉÀ» ¼öÇàÇÏ±â À§ÇØ¼­ BlueprintImplementableEvent Å°¿öµå¸¦ ÁöÁ¤ÇÑ´Ù.
-	// Meta¿¡ DisplayNameÀ» ÁöÁ¤ÇÏ¸é ºí·çÇÁ¸°Æ®¿¡¼­ º¸¿©Áú ÇÔ¼ö¸íÀ» ÁöÁ¤ÇÒ ¼ö ÀÖ´Ù
+	// ë¸”ë£¨í”„ë¦°íŠ¸ì—ì„œ ì´ë²¤íŠ¸ë¥¼ ë°œë™ì‹œí‚¤ëŠ” ê²ƒì²˜ëŸ¼ ê¸°ëŠ¥ì„ ìˆ˜í–‰í•˜ê¸° ìœ„í•´ì„œ BlueprintImplementableEvent í‚¤ì›Œë“œë¥¼ ì§€ì •í•œë‹¤.
+	// Metaì— DisplayNameì„ ì§€ì •í•˜ë©´ ë¸”ë£¨í”„ë¦°íŠ¸ì—ì„œ ë³´ì—¬ì§ˆ í•¨ìˆ˜ëª…ì„ ì§€ì •í•  ìˆ˜ ìˆë‹¤
 	UFUNCTION(BlueprintImplementableEvent, Category = Game, Meta = (DisplayName = "OnScoreChangedCpp"))	
 	void K2_OnScoreChanged(int32 NewScore); 
-	// K2 ¶ó´Â Á¢µÎ»ç´Â ºí·çÇÁ¸°Æ®ÀÇ Àü½ÅÀÎ Kismet ÀÌ¶ó°í ÇÏ´Â ±â´ÉÀ» ³ªÅ¸³»´Â °ü½ÀÀûÀ¸·Î »ç¿ëÇÏ´Â Á¢µÎ»çÀÌ´Ù. 
-	// GameScoreChanged ÇÔ¼ö¿Í µ¿ÀÏÇÑ ¿ªÇÒ °¡Áö°í ÀÖÁö¸¸ ÇÔ¼ö ÀÌ¸§ÀÌ ´Ş¶ó¾ß ÇØ¼­ Á¢µÎ»ç¸¦ »ç¿ëÇÑ´Ù.
-	// K2_OnScoreChanged ÀÇ °æ¿ì´Â ÇÔ¼ö¸¦ ±¸ÇöÇÏÁö ¾Ê¾Æµµ ¾ğ¸®¾ó ¿£ÁøÀÌ ÀÌ UFUNTION ¸ÅÅ©·Î¸¦ ÅëÇØ 
-	// ÀÚµ¿À¸·Î ÀÌº¥Æ®ÀÓÀ» °¨ÁöÇØ¼­ º»¹®À» ¸¸µé¾îÁÖ±â ¶§¹®¿¡ ¿À·ùÃ¢ÀÌ ÀÖ´õ¶óµµ ¹«½ÃÇØµµ µÊ
+	/* 
+ 	   K2 ë¼ëŠ” ì ‘ë‘ì‚¬ëŠ” ë¸”ë£¨í”„ë¦°íŠ¸ì˜ ì „ì‹ ì¸ Kismet ì´ë¼ê³  í•˜ëŠ” ê¸°ëŠ¥ì„ ë‚˜íƒ€ë‚´ëŠ” ê´€ìŠµì ìœ¼ë¡œ ì‚¬ìš©í•˜ëŠ” ì ‘ë‘ì‚¬ì´ë‹¤. 
+	   GameScoreChanged í•¨ìˆ˜ì™€ ë™ì¼í•œ ì—­í•  ê°€ì§€ê³  ìˆì§€ë§Œ í•¨ìˆ˜ ì´ë¦„ì´ ë‹¬ë¼ì•¼ í•´ì„œ ì ‘ë‘ì‚¬ë¥¼ ì‚¬ìš©í•œë‹¤.
+	   K2_OnScoreChanged ì˜ ê²½ìš°ëŠ” í•¨ìˆ˜ë¥¼ êµ¬í˜„í•˜ì§€ ì•Šì•„ë„ ì–¸ë¦¬ì–¼ ì—”ì§„ì´ ì´ UFUNTION ë§¤í¬ë¡œë¥¼ í†µí•´ 
+	   ìë™ìœ¼ë¡œ ì´ë²¤íŠ¸ì„ì„ ê°ì§€í•´ì„œ ë³¸ë¬¸ì„ ë§Œë“¤ì–´ì£¼ê¸° ë•Œë¬¸ì— ì˜¤ë¥˜ì°½ì´ ìˆë”ë¼ë„ ë¬´ì‹œí•´ë„ ë¨
+	*/
 
 	UFUNCTION(BlueprintImplementableEvent, Category = Game, Meta = (DisplayName = "OnGameClearCpp"))
 	void K2_OnGameClear();
@@ -35,7 +37,7 @@ public:
 	void K2_OnGameOver();
 
 	UFUNCTION(BlueprintImplementableEvent, Category = Game, Meta = (DisplayName = "OnGameRetryCountCpp"))
-	void K2_OnGameRetryCount(int32 NewRetryCount); // ÀúÀå ½Ã ¹ß»ıÇÒ ÀÌº¥Æ® Ãß°¡
+	void K2_OnGameRetryCount(int32 NewRetryCount); // ì €ì¥ ì‹œ ë°œìƒí•  ì´ë²¤íŠ¸ ì¶”ê°€
 
 	void GameScoreChanged(int32 NewScore);
 	void GameClear();
