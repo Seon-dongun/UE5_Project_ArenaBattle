@@ -48,7 +48,7 @@ void AABPlayerController::BeginPlay()
 	SetInputMode(GameOnlyInputMode);
 
 	SaveGameInstance = Cast<UABSaveGame>(UGameplayStatics::LoadGameFromSlot(TEXT("Player0"),0)); 
-	// 게임을 편리하게 저장할 수 있게 해주는 LoadGameFromSlot 함수. TEXT 타입의 저장 파일 이름과 대응되는 
+	// 세이브 파일을 불러오는 LoadGameFromSlot 함수. TEXT 타입의 저장 파일 이름과 대응되는 
 	// 플레이어의 아이디를 인자로 주면 된다. 싱글 플레이의 경우 항상 플레이어 아이디는 0이다
 	if (SaveGameInstance)
 	{
