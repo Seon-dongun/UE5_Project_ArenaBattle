@@ -68,11 +68,11 @@ void AABCharacterPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Á×¾úÀ» ¶§ ÀÔ·ÂÀ» ²ô´Â ÄÚµå¿Í µ¿ÀÏÇÏ°Ô ÀÔ·Â ÄÑ´Â ÄÚµå¸¦ ¸ÂÃç¼­ È¤½Ã ¸ğ¸¦ ºÒ»ó»ç¸¦ Â÷´Ü
-	APlayerController* PlayerController = Cast<APlayerController>(GetController()); // ÄÁÆ®·Ñ·¯¸¦ °¡Á®¿Í¼­
+	// ì£½ì—ˆì„ ë•Œ ì…ë ¥ì„ ë„ëŠ” ì½”ë“œì™€ ë™ì¼í•˜ê²Œ ì…ë ¥ ì¼œëŠ” ì½”ë“œë¥¼ ë§ì¶°ì„œ í˜¹ì‹œ ëª¨ë¥¼ ë¶ˆìƒì‚¬ë¥¼ ì°¨ë‹¨
+	APlayerController* PlayerController = Cast<APlayerController>(GetController()); // ì»¨íŠ¸ë¡¤ëŸ¬ë¥¼ ê°€ì ¸ì™€ì„œ
 	if (PlayerController)
 	{
-		EnableInput(PlayerController); // ÀÔ·ÂÀ» ÄÑ´Â ÇÔ¼öÀÎ EnableInput ÇÔ¼ö ½ÇÇà
+		EnableInput(PlayerController); // ì…ë ¥ì„ ì¼œëŠ” í•¨ìˆ˜ì¸ EnableInput í•¨ìˆ˜ ì‹¤í–‰
 	}
 
 	SetCharacterControl(CurrentCharacterControlType);
@@ -80,20 +80,19 @@ void AABCharacterPlayer::BeginPlay()
 
 void AABCharacterPlayer::SetDead()
 {
-	Super::SetDead(); 	// ±âº»ÀûÀ¸·Î »ç¸Á ½Ã ÀÌµ¿À» ²ô°í, ¾Ö´Ï¸ŞÀÌ¼ÇÀ» Àç»ıÇÏ°í, Ãæµ¹À» ¾ø¾Ö°í, HP ¹Ù¸¦ ¾ø¾Ö´Â ±â´ÉÀ» ±¸Çö
+	Super::SetDead();
 	
-	// ÇÃ·¹ÀÌ¾î´Â Ãß°¡ÀûÀ¸·Î ÇöÀç ÀÔ·ÂÀ» ´õ ÀÌ»ó Àü´ŞÇÏÁö ¾Êµµ·Ï, ÀÔ·ÂÀ» ²ô´Â ±â´É Ãß°¡
-	APlayerController* PlayerController = Cast<APlayerController>(GetController()); // ÄÁÆ®·Ñ·¯¸¦ °¡Á®¿Í¼­
-	if (PlayerController)
+	// í”Œë ˆì´ì–´ëŠ” ì¶”ê°€ì ìœ¼ë¡œ í˜„ì¬ ì…ë ¥ì„ ë” ì´ìƒ ì „ë‹¬í•˜ì§€ ì•Šë„ë¡, ì…ë ¥ì„ ë„ëŠ” ê¸°ëŠ¥ ì¶”ê°€
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
 	{
-		DisableInput(PlayerController); // ÀÔ·ÂÀ» ²ô´Â ÇÔ¼öÀÎ DisableInput ÇÔ¼ö ½ÇÇà
+		DisableInput(PlayerController); // ì…ë ¥ì„ ë„ëŠ” í•¨ìˆ˜ì¸ DisableInput í•¨ìˆ˜ ì‹¤í–‰
 
-		// Auth´Â AuthorizedÀÇ ¾àÀÚ·Î ÀÎÁõ¹Ş¾ÒÀ½À» ÀÇ¹ÌÇÑ´Ù. ¿ì¸®°¡ ¸ÖÆ¼ÇÃ·¹ÀÌ±îÁö °ÔÀÓÀÇ ¹üÀ§¸¦ È®Àå½ÃÄ×À» ¶§, 
-		// ÀÌ °ÔÀÓ¸ğµå´Â ¸ğµç °ÔÀÓ ÅëÆ²¾î ´Ü ÇÏ³ª¸¸ Á¸ÀçÇÑ´Ù. ±×·¸±â ¶§¹®¿¡ AuthGameMode ¶ó°í ÇÏ´Â °ÍÀº ¹æÀåÀÌ ¼ÒÀ¯ÇÑ °ÔÀÓ ¸ğµå¶ó°í ÀÌÇØÇÏ¸é µÈ´Ù
-		IABGameInterface* ABGameMode = Cast<IABGameInterface>(GetWorld()->GetAuthGameMode()); // °ÔÀÓ ¸ğµå Á¤º¸¸¦ °¡Á®¿Í¼­
+		// AuthëŠ” Authorizedì˜ ì•½ìë¡œ ì¸ì¦ë°›ì•˜ìŒì„ ì˜ë¯¸í•œë‹¤. ìš°ë¦¬ê°€ ë©€í‹°í”Œë ˆì´ê¹Œì§€ ê²Œì„ì˜ ë²”ìœ„ë¥¼ í™•ì¥ì‹œì¼°ì„ ë•Œ, 
+		// ì´ ê²Œì„ëª¨ë“œëŠ” ëª¨ë“  ê²Œì„ í†µí‹€ì–´ ë‹¨ í•˜ë‚˜ë§Œ ì¡´ì¬í•œë‹¤. ê·¸ë ‡ê¸° ë•Œë¬¸ì— AuthGameMode ë¼ê³  í•˜ëŠ” ê²ƒì€ ë°©ì¥ì´ ì†Œìœ í•œ ê²Œì„ ëª¨ë“œë¼ê³  ì´í•´í•˜ë©´ ëœë‹¤
+		IABGameInterface* ABGameMode = Cast<IABGameInterface>(GetWorld()->GetAuthGameMode()); // ê²Œì„ ëª¨ë“œ ì •ë³´ë¥¼ ê°€ì ¸ì˜µë‹ˆë‹¤
 		if (ABGameMode)
 		{
-			ABGameMode->OnPlayerDead(); // ÇöÀç ÇÃ·¹ÀÌ¾î°¡ »ç¸ÁÇßÀ½À» ¾Ë¸®´Â ÇÔ¼ö¸¦ È£Ãâ
+			ABGameMode->OnPlayerDead(); // í˜„ì¬ í”Œë ˆì´ì–´ê°€ ì‚¬ë§í–ˆìŒì„ ì•Œë¦¬ëŠ” í•¨ìˆ˜ë¥¼ í˜¸ì¶œ
 		}
 	}
 
@@ -212,10 +211,10 @@ void AABCharacterPlayer::Attack()
 
 void AABCharacterPlayer::SetupHUDWidget(UABHUDWidget* InHUDWidget)
 {
-	// µé¾î¿Â ÀÎÀÚ¸¦ »ç¿ëÇØ¼­ ½ºÅÈ¿¡ ÀÖ´Â µ¥ÀÌÅÍ¸¦ ³Ñ°ÜÁÖ°í ½ºÅÈ¿¡ ÀÖ´Â µ¨¸®°ÔÀÌÆ®¸¦ ¹ÙÀÎµù½ÃÄÑÁÖ´Â ·ÎÁ÷
+	// ë“¤ì–´ì˜¨ ì¸ìë¥¼ ì‚¬ìš©í•´ì„œ ìŠ¤íƒ¯ì— ìˆëŠ” ë°ì´í„°ë¥¼ ë„˜ê²¨ì£¼ê³  ìŠ¤íƒ¯ì— ìˆëŠ” ë¸ë¦¬ê²Œì´íŠ¸ë¥¼ ë°”ì¸ë”©ì‹œì¼œì£¼ëŠ” ë¡œì§
 	if (InHUDWidget)
 	{
-		// À§Á¬ÀÇ µ¥ÀÌÅÍ¸¦ ½ºÅÈÀÇ Á¤º¸·Î ¹Ù²Ş
+		// ìœ„ì ¯ì˜ ë°ì´í„°ë¥¼ ìŠ¤íƒ¯ì˜ ì •ë³´ë¡œ ë°”ê¿ˆ
 		InHUDWidget->UpdateStat(Stat->GetBaseStat(), Stat->GetModifierStat());
 		InHUDWidget->UpdateHpBar(Stat->GetCurrentHp());
 
