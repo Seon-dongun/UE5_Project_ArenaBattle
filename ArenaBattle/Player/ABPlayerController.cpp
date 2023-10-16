@@ -10,7 +10,7 @@ DEFINE_LOG_CATEGORY(LogABPlayerController);
 
 AABPlayerController::AABPlayerController()
 {
-	static ConstructorHelpers::FClassFinder<UABHUDWidget> ABHUDWidgetRef(TEXT("/Game/ArenaBattle/UI/WBP_ABHUD.WBP_ABHUD_C")); // HUDÀÇ Å¬·¡½º Á¤º¸ ÀúÀå
+	static ConstructorHelpers::FClassFinder<UABHUDWidget> ABHUDWidgetRef(TEXT("/Game/ArenaBattle/UI/WBP_ABHUD.WBP_ABHUD_C")); // HUDì˜ í´ë˜ìŠ¤ ì •ë³´ ì €ì¥
 	if (ABHUDWidgetRef.Class)
 	{
 		ABHUDWidgetClass = ABHUDWidgetRef.Class;
@@ -19,7 +19,6 @@ AABPlayerController::AABPlayerController()
 
 void AABPlayerController::GameScoreChanged(int32 NewScore)
 {
-	// ½ºÄÚ¾î°¡ º¯°æµÇ¾ú´Ù´Â GameScoreChanged ÇÔ¼ö°¡ ½ÇÇàµÇ¸éÀº K2_OnScoreChanged ÇÔ¼ö°¡ È£ÃâµÇµµ·Ï ±¸Á¶¸¦ Àâ´Â´Ù
 	K2_OnScoreChanged(NewScore);
 }
 
@@ -32,10 +31,10 @@ void AABPlayerController::GameOver()
 {
 	K2_OnGameOver();
 
-	// °ÔÀÓÀÌ Á¾·áµÇ¸é SaveGameToSlot ÇÔ¼ö¸¦ »ç¿ëÇØ ¼¼ÀÌºê ÆÄÀÏ ¸í°ú ¾ÆÀÌµğ°ªÀ» ÁÖ¾î °ÔÀÓÀ» ÀúÀåÇÑ´Ù
+	// ê²Œì„ì´ ì¢…ë£Œë˜ë©´ SaveGameToSlot í•¨ìˆ˜ë¥¼ ì‚¬ìš©í•´ ì„¸ì´ë¸Œ íŒŒì¼ ëª…ê³¼ ì•„ì´ë””ê°’ì„ ì£¼ì–´ ê²Œì„ì„ ì €ì¥í•œë‹¤
 	if (!UGameplayStatics::SaveGameToSlot(SaveGameInstance, TEXT("Player0"), 0))
 	{
-		UE_LOG(LogABPlayerController, Error, TEXT("Save Game Error!")); // ¸¸¾à ÀúÀå¿¡ ½ÇÆĞÇÏ¸é ¿¡·¯ ·Î±×¸¦ ¶ç¿î´Ù
+		UE_LOG(LogABPlayerController, Error, TEXT("Save Game Error!")); // ë§Œì•½ ì €ì¥ì— ì‹¤íŒ¨í•˜ë©´ ì—ëŸ¬ ë¡œê·¸ë¥¼ ë„ìš´ë‹¤
 	}
 
 	K2_OnGameRetryCount(SaveGameInstance->RetryCount);
@@ -49,16 +48,16 @@ void AABPlayerController::BeginPlay()
 	SetInputMode(GameOnlyInputMode);
 
 	SaveGameInstance = Cast<UABSaveGame>(UGameplayStatics::LoadGameFromSlot(TEXT("Player0"),0)); 
-	// °ÔÀÓÀ» Æí¸®ÇÏ°Ô ÀúÀåÇÒ ¼ö ÀÖ°Ô ÇØÁÖ´Â LoadGameFromSlot ÇÔ¼ö. TEXT Å¸ÀÔÀÇ ÀúÀå ÆÄÀÏ ÀÌ¸§°ú ´ëÀÀµÇ´Â 
-	// ÇÃ·¹ÀÌ¾îÀÇ ¾ÆÀÌµğ¸¦ ÀÎÀÚ·Î ÁÖ¸é µÈ´Ù. ½Ì±Û ÇÃ·¹ÀÌÀÇ °æ¿ì Ç×»ó ÇÃ·¹ÀÌ¾î ¾ÆÀÌµğ´Â 0ÀÌ´Ù
+	// ê²Œì„ì„ í¸ë¦¬í•˜ê²Œ ì €ì¥í•  ìˆ˜ ìˆê²Œ í•´ì£¼ëŠ” LoadGameFromSlot í•¨ìˆ˜. TEXT íƒ€ì…ì˜ ì €ì¥ íŒŒì¼ ì´ë¦„ê³¼ ëŒ€ì‘ë˜ëŠ” 
+	// í”Œë ˆì´ì–´ì˜ ì•„ì´ë””ë¥¼ ì¸ìë¡œ ì£¼ë©´ ëœë‹¤. ì‹±ê¸€ í”Œë ˆì´ì˜ ê²½ìš° í•­ìƒ í”Œë ˆì´ì–´ ì•„ì´ë””ëŠ” 0ì´ë‹¤
 	if (SaveGameInstance)
 	{
-		SaveGameInstance->RetryCount++; // ·Îµå ¼º°ø ½Ã, ±âÁ¸ÀÇ RetryCount¸¦ Áõ°¡
+		SaveGameInstance->RetryCount++; // ë¡œë“œ ì„±ê³µ ì‹œ, ê¸°ì¡´ì˜ RetryCountë¥¼ ì¦ê°€
 	}
 	else
 	{
-		SaveGameInstance = NewObject<UABSaveGame>(); // ·Îµå ½ÇÆĞ ½Ã, ÀúÀåµÈ °ªÀÌ ¾ø±â ¶§¹®¿¡ »õ·Î¿î ¼¼ÀÌºê °´Ã¼¸¦ »ı¼º
-		SaveGameInstance->RetryCount = 0; // Ã³À½ ¼¼ÀÌºê »ı¼º ½Ã RetryCount´Â 0À¸·Î ÃÊ±âÈ­µÊ
+		SaveGameInstance = NewObject<UABSaveGame>(); // ë¡œë“œ ì‹¤íŒ¨ ì‹œ, ì €ì¥ëœ ê°’ì´ ì—†ê¸° ë•Œë¬¸ì— ìƒˆë¡œìš´ ì„¸ì´ë¸Œ ê°ì²´ë¥¼ ìƒì„±
+		SaveGameInstance->RetryCount = 0; // ì²˜ìŒ ì„¸ì´ë¸Œ ìƒì„± ì‹œ RetryCountëŠ” 0ìœ¼ë¡œ ì´ˆê¸°í™”ë¨
 	}
 
 	K2_OnGameRetryCount(SaveGameInstance->RetryCount);
