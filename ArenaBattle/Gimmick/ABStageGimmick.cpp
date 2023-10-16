@@ -211,7 +211,7 @@ void AABStageGimmick::OnOpponentDestroyed(AActor* DesetroyActor)
 	IABGameInterface* ABGameMode = Cast<IABGameInterface>(GetWorld()->GetAuthGameMode());
 	if (ABGameMode)
 	{
-		ABGameMode->OnPlayerScoreChanged(CurrentStageNum); // 클리어 한 현재 StageNum을 인자로 주어 확인하여 스테이지를 클리어했는지 안했는지 확인한다
+		ABGameMode->OnPlayerScoreChanged(CurrentStageNum); // 클리어 한 현재 StageNum을 인자로 주어 확인하여 게임 클리어 여부를 확인한다
 		if (ABGameMode->IsGameCleared())
 		{
 			return; // 게임이 클리어 된 상태라면 다음 상태로 진행되지 않도록 즉시 리턴. 이러면 보상 상자가 나오지 않고 멈추게 된다
